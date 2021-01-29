@@ -11,7 +11,13 @@
 
     <h1 class="text-center">Negociações</h1>
 
-    <form class="form">
+    <!--
+    Estamos usando a instância do controller que criamos no final desse arquivo para
+    executar o método desejado do controller quando um evento de submit for executado.
+    Em resumo: quando o usuário tentar enviar os dados do formulário, onsubmit
+    vai executar o método adiciona da instãncia negociacaoController.
+   -->
+    <form class="form" onsubmit="negociacaoController.adiciona(event)">
 
         <div class="form-group">
             <label for="data">Data</label>
@@ -59,41 +65,19 @@
         </tfoot>
     </table>
     <script src="js/models/Negociacao.js"></script>
+    <script src="js/controllers/NegociacaoController.js"></script>
     <script>
-      // criando dois objeto de Negociacao
       /*
-      Diferença entre usar "var" e "let".
-      "var" não possui escopo de bloco. Ou seja, nós teremos
-      acesso ao valor da variável mesmo fora de blocos lógicos.
-      "let" possui escopo de bloco. Isso limita o acesso a seu valor.
+      Criando uma instância de NegociacaoController.
+      Essa instãncia está sendo utilizada em onsubmit da tag <form>.
 
-      Ex.:
-      =============================================
-      for(var i = 1; i <= 100; i++) {
-         let nome = 'Flávio';
-         console.log(i);
-      }
-      alert(i);
-      =============================================
-
-      No exemplo acima, vamos conseguir exibir o valor da variável "i" em um popup.
-      Caso a gente substitua "let" por "var" isso não será possível
-      (assim como funciona no Java).
+      A estratégia utilizada aqui é um pouco diferente do que vem sendo feita.
+      Geralmente, a associação entre tag e o evento é feita no parte JS
+      do projeto. Mas inspirado por framework como o AngularJS, por exemplo,
+      que faz a associação de uma ação da controller utilizando um evento.
+      Usaremos isso, para escrever menos código na parte JavaScript.
       */
-      let n1 = new Negociacao(new Date(), 5, 700);
-
-      // Graças a Object.freeze() que está dentro de Negociação, não é
-      // possível alterar o valor dos atributos
-      n1._quantidade = 800;
-
-      // Graças ao tipo de programação que fizemos dentro da Classe, não é possível alterar o valor da data
-      n1.data.setDate(10);
-
-      // acessando cada atributo graças ao método get
-      console.log(n1.quantidade);
-      console.log(n1.data);
-      console.log(n1.valor);
-      console.log(n1.volume);
+      let negociacaoController = new NegociacaoController();
     </script>
 </body>
 </html>
