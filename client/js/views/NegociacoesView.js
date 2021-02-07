@@ -43,17 +43,20 @@ class NegociacoesView {
       <tfoot>
         <td colspan="3">TOTAL</td>
         <!--
-        Para imprimir o total, utilizaremos uma Immediately-invoked function expression (IIFE) ou a função imediata.
-        Trata-se de um recurso usado na criação de escopo em JavaScript, que nos ajudará a colocar um bloco na
-        expressão, sendo executado imediatamente. No caso, o $ receberá o total.
+        Observe que utilizamos a função reduce(), que irá processar o array e no fim, disponibiliza um único resultado.
+
+        Optamos por passar uma função com as variáveis total e n(elementos da lista) - ambas receberam esses nomes,
+        mas poderíamos ter definido outros.
+        O return que criamos ainda não será suficiente. Qual será o valor inicial de total?
+        Ele deve iniciar de 0 para conseguirmos somá-lo com volume.
+        Por isso, o segundo parâmetro da função reduce() será a inicialização da variável total.
+
+        Basicamente, nós pedimos que negociacoes reduzisse. Em seguida, executamos a função para cada item da lista.
+        A variável total começou com o valor igual a 0 e foi somado com o volume.
+        Quando passamos para o segundo item da lista, este pega o valor anterior e o
+        soma com o volume atual. No fim, a função retorna um valor único, que será o resultado de total.
          -->
-        <td>${
-            (function() {
-                let total = 0;
-                modelo.negociacoes.forEach(n => total += n.volume);
-                return total;
-           })()
-          }
+        <td>${ modelo.negociacoes.reduce((total, n) => total + n.volume, 0.0)}
         </td>
     </tfoot>
     </table>
