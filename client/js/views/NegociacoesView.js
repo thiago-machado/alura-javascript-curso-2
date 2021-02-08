@@ -1,8 +1,10 @@
-class NegociacoesView {
+class NegociacoesView extends View {
 
-  constructor(elemento) {
-    this._elemento = elemento;
-  }
+  // Por padrão, quando uma classe herda outra, ela também herda seu construtor.
+  // Caso eu quisesse chamar o construtor da classe pai, eu deveria fazer o que está programado abaixo
+  /*constructor(elemento) {
+    super(elemento); // Chamando o construtor de View
+  }*/
 
   /*
   Dentro da template string, adicionamos as tags <tr> e <td>, e usamos várias
@@ -63,7 +65,4 @@ class NegociacoesView {
     `;
   }
 
-  update(modelo) {
-    this._elemento.innerHTML = this._template(modelo);
-  }
 }
