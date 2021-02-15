@@ -1,32 +1,26 @@
 class NegociacaoController {
 
   constructor() {
-    /*
-    ###SOBRE O QUERY SELECTOR###
-    O querySelector é uma função que pertence ao objeto document - chamaremos
-    tal função de método.
-    Internamente, o querySelector tem uma chamada para o this, que é o contexto pelo
-    qual o método é chamado.
-    Logo, o this é o document.
-    No entanto, quando colocamos o querySelector dentro do $, ele passa a ser
-    executado fora do contexto de document e isto não funciona.
-    O que devemos fazer, então?
-    Queremos tratar o querySelector como uma função separada.
-    Nós queremos que ao colocarmos o querySelector para o $, ele mantenha a
-    associação com o document. Para isto, usaremos o bind()
 
-    ###SOBRE PERFORMANCE###
-    Quando o NegociacaoController for criado pela primeira vez, ele buscará os
-    elementos do DOM do document, que serão guardados nas propriedades da classe.
-    Agora, mesmo que façamos 300 negociações, ele só fará uma busca no DOM
-    pelos elementos. Com isto, conseguimos melhorar a performance.
-    */
     let $ = document.querySelector.bind(document);
     this._inputData = $('#data');
     this._inputQuantidade =  $('#quantidade');
     this._inputValor = $('#valor');
-    
-    this._listaNegociacoes = new ListaNegociacoes();
+
+    /*
+    Estou passando para o construtor de ListaNegociacoes uma function.
+    Essa function irá executar o método update() de _negociacoesView.
+    Essa function recebe um modelo, que nada mais é que a própria lista de negociações
+    (acessar classe ListaNegociacoes para ver o parametro sendo passado).
+
+    Ou seja, toda vez que o método adiciona() ou apaga() de this._listaNegociacoes
+    for executado, essa função será executada (acessar ListaNegociacoes para ver isso).
+    */
+    this._listaNegociacoes = new ListaNegociacoes(
+      this, // passando a prórpia instância de NegociacaoController
+      function(modelo) { this._negociacoesView.update(modelo);} // passando uma função 
+    );
+
     this._negociacoesView = new NegociacoesView($('#negociacoesView'));
     this._negociacoesView.update(this._listaNegociacoes);
 
@@ -38,7 +32,8 @@ class NegociacaoController {
   adiciona(event) {
     event.preventDefault();
     this._listaNegociacoes.adiciona(this._criaNegociacao());
-    this._negociacoesView.update(this._listaNegociacoes);
+    // A atualização da view será feita dentro do adicona()
+    // this._negociacoesView.update(this._listaNegociacoes);
 
     this._mensagem.texto = 'Negociação adicionada com sucesso';
     this._mensagemView.update(this._mensagem);
@@ -61,5 +56,15 @@ class NegociacaoController {
     this._inputQuantidade.value = 1;
     this._inputValor.value = 0.0
     this._inputData.focus();
+  }
+
+  // Limpa a tabela caso o usuário clique no botão Apagar
+  apaga() {
+    this._listaNegociacoes.esvazia();
+    // A atualização da view será feita dentro do esvazia()
+    //this._negociacoesView.update(this._listaNegociacoes);
+
+    this._mensagem.texto = 'Negociações apagadas com sucesso';
+    this._mensagemView.update(this._mensagem);
   }
 }
