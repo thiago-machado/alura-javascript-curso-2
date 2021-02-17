@@ -90,48 +90,57 @@
       definirmos.
       */
       // Proxy(object, {handlers});
-      let negociacao = new Proxy(new Negociacao(new Date(), 2, 100), {
+      let lista = new Proxy(new ListaNegociacoes(), {
 
         /*
-        Criando uma "trap" que será executada toda vez que algum método "get" for
-        chamado em Negociacao.
-        target = uma referência ao objeto original que está encapsulado pelo Proxy;
-        prop = propriedade que está sendo acessada;
-        receiver = referência para o Proxy.
+        Interceptando as execuções dos métodos adiciona e esvazia
         */
-        get: function(target, prop, receiver) {
+        get(target, prop, receiver) {
+          /*
+          Verificando se a propriedade possui o texto 'adiciona', ou 'esvazia'.
+          Além disso, verifica se a propriedade é uma função. Pois pode acontecer de
+          termos atributos com esses nomes e isso não nos interessa interceptar.
 
-          // A execução dos console.log nas linhas abaixo executou essa "trap"
-          // Essa trap irá exibir a mensagem abaixo antes de exibir os valores das vairáveis
-          console.log(`A propriedade "${prop}" foi interceptada`);
+          Caso a condição seja atendida, retornamos uma function.
+          Com isso, estamos reescrevendo a lógica implementada em adiciona e esvazia.
+          No caso, desejamos exibir uma mensagem no log e desejamos executar a função
+          original através do Reflect.apply().
+          */
+          if(['adiciona', 'esvazia'].includes(prop) && typeof(target[prop]) == typeof(Function)) {
+              // Nesse momento, estamos substituindo a implementação dos métodos interceptados
+              // IMPORTANTE: não podemos usar arrow function pois precisamos de um contexto dinâmico para execução da lógica.
+              return function() {
+                
+                console.log(`a propriedade "${prop}" foi interceptada`); // exibindo log
 
-          // Como estamos interceptando as chamadas dos "get", precisamos retornar seus
-          // respectivos valores.
+                /*
+                Continuar com a execução original do método interceptado.
+                1º param = o método que desejo executar
+                2º param = o contexto
+                3º param = os valores que desejo passar para a função por parâmetro
+
+                NOTA: o arguments é uma variável implícita que dá acesso a todos
+                os parâmetros da função quando esta é chamada.
+                Ou seja, se eu chamar arguments[0], terei acesso ao primeiro valor passado como
+                parâmetro e assim por diante.
+                */
+                Reflect.apply(target[prop], target, arguments);
+              }
+          }
+
+          // Caso não atenda ao if acima, continua com a execução padrão
           return Reflect.get(target, prop, receiver);
-        },
-
-        /*
-        Criando uma "trap" para quando um "set" for realizado em alguma variável.
-        target = uma referência ao objeto original que está encapsulado pelo Proxy;
-        prop = propriedade que está sendo acessada;
-        value = novo valor que desejo atribuir;
-        receiver = referência para o Proxy.
-        */
-        set: function(target, prop, value, receiver) {
-
-         console.log(`Valor anterior: ${target[prop]} - Novo valor: ${value}`);
-         return Reflect.set(target, prop, value, receiver);
-       }
-
+        }
       });
 
-      // Essa execução executará a "trap" que está interceptando o "get"
-      console.log(negociacao.quantidade);
-      console.log(negociacao.valor);
+      /*
+      Toda vez que executamos um método/função, o JavaScript executa um GET e depois um
+      APPLY. Logo, quando executarmos as funções adiciona() e esvaliza(), vamos
+      interceptar a chamada desses métodos através do GET
+      */
+      lista.adiciona(new Negociacao(new Date(), 1, 100));
+      lista.esvazia();
 
-      // Essa execução executará a "trap" que está interceptando o "set"
-      negociacao._quantidade = 20;
-      negociacao._valor = 790;
     </script>
 </body>
 </html>
