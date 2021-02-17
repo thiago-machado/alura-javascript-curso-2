@@ -72,5 +72,66 @@
       */
       let negociacaoController = new NegociacaoController();
     </script>
+
+
+    <script>
+
+      /*
+      Existe um famoso padrão de projeto chamado Proxy, que de forma resumida,
+      é "um cara mentiroso".
+      Vimos que não é bom inserirmos armadilhas na classe, porque estaremos
+      perdendo a reutilização do modelo e teremos que repetir em todos os
+      modelos do sistema. No entanto, o Proxy é idêntico ao objeto que queremos
+      trabalhar, e teremos bastante dificuldade de diferenciá-los.
+      Nós acessamos o Proxy como se ele fosse o objeto real, este último
+      ficará escondido dentro do outro.
+      Nós substituímos o objeto real, que só poderá ser acessado por meio do
+      Proxy - que pode ou não ser executado em um código arbitrário se assim
+      definirmos.
+      */
+      // Proxy(object, {handlers});
+      let negociacao = new Proxy(new Negociacao(new Date(), 2, 100), {
+
+        /*
+        Criando uma "trap" que será executada toda vez que algum método "get" for
+        chamado em Negociacao.
+        target = uma referência ao objeto original que está encapsulado pelo Proxy;
+        prop = propriedade que está sendo acessada;
+        receiver = referência para o Proxy.
+        */
+        get: function(target, prop, receiver) {
+
+          // A execução dos console.log nas linhas abaixo executou essa "trap"
+          // Essa trap irá exibir a mensagem abaixo antes de exibir os valores das vairáveis
+          console.log(`A propriedade "${prop}" foi interceptada`);
+
+          // Como estamos interceptando as chamadas dos "get", precisamos retornar seus
+          // respectivos valores.
+          return Reflect.get(target, prop, receiver);
+        },
+
+        /*
+        Criando uma "trap" para quando um "set" for realizado em alguma variável.
+        target = uma referência ao objeto original que está encapsulado pelo Proxy;
+        prop = propriedade que está sendo acessada;
+        value = novo valor que desejo atribuir;
+        receiver = referência para o Proxy.
+        */
+        set: function(target, prop, value, receiver) {
+
+         console.log(`Valor anterior: ${target[prop]} - Novo valor: ${value}`);
+         return Reflect.set(target, prop, value, receiver);
+       }
+
+      });
+
+      // Essa execução executará a "trap" que está interceptando o "get"
+      console.log(negociacao.quantidade);
+      console.log(negociacao.valor);
+
+      // Essa execução executará a "trap" que está interceptando o "set"
+      negociacao._quantidade = 20;
+      negociacao._valor = 790;
+    </script>
 </body>
 </html>

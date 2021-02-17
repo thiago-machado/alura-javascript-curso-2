@@ -27,11 +27,11 @@ class NegociacaoController {
     amarrada a um escopo imutável.
     O this de uma arrow function não pode ser alterado, mesmo se usarmos recursos da linguagem, como a API Reflect.
     */
-    this._listaNegociacoes = new ListaNegociacoes(
+    /*this._listaNegociacoes = new ListaNegociacoes(
       // Passando uma função como parâmetro.
       // Como estamos usando arrow function, o this aqui é da própria instância de NegociacaoController
       modelo => this._negociacoesView.update(modelo)
-    );
+    );*/
 
     this._negociacoesView = new NegociacoesView($('#negociacoesView'));
     this._negociacoesView.update(this._listaNegociacoes);
