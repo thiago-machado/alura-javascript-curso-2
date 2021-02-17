@@ -15,10 +15,22 @@ class NegociacaoController {
 
     Ou seja, toda vez que o método adiciona() ou apaga() de this._listaNegociacoes
     for executado, essa função será executada (acessar ListaNegociacoes para ver isso).
+
+
+    A arrow function não é apenas uma maneira sucinta de escrever uma função,
+    ela também tem um característica peculiar: o escopo de this é léxico, em vez de
+    ser dinâmico como a outra função.
+
+    Isto significa que o this não mudará de acordo com o contexto.
+    Da maneira como estruturamos o código, o this será NegociacaoController - esta condição será
+    mantida independente do local em que chamemos a arrow function, porque ela está
+    amarrada a um escopo imutável.
+    O this de uma arrow function não pode ser alterado, mesmo se usarmos recursos da linguagem, como a API Reflect.
     */
     this._listaNegociacoes = new ListaNegociacoes(
-      this, // passando a prórpia instância de NegociacaoController
-      function(modelo) { this._negociacoesView.update(modelo);} // passando uma função 
+      // Passando uma função como parâmetro.
+      // Como estamos usando arrow function, o this aqui é da própria instância de NegociacaoController
+      modelo => this._negociacoesView.update(modelo)
     );
 
     this._negociacoesView = new NegociacoesView($('#negociacoesView'));
