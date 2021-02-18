@@ -31,10 +31,11 @@ class ProxyFactory {
           console.log(`A propriedade "${prop}" foi interceptada`);
 
           // Precisamos atualizar a propriedade com o novo valor antes de chamar a ação
+          // Senão, a execução da ação não terá nenhum valor novo
           target[prop] = value;
           acao(target);
         }
-        
+
         return Reflect.set(target, prop, value, receiver);
       }
     });

@@ -9,22 +9,11 @@ class NegociacaoController {
 
     let self = this;
 
-    this._listaNegociacoes = ProxyFactory.create(
-      new ListaNegociacoes(),
-      ['adiciona', 'esvazia'],
-      // Aqui usamos arrow function pois _negociacoesView pertence ao contexto de NegociacaoController
-      modelo => this._negociacoesView.update(modelo));
-
     this._negociacoesView = new NegociacoesView($('#negociacoesView'));
-    this._negociacoesView.update(this._listaNegociacoes);
-
-    this._mensagem = ProxyFactory.create(
-      new Mensagem(),
-      ['texto'],
-      modelo => this._mensagemView.update(modelo));
+    this._listaNegociacoes = new Bind(new ListaNegociacoes(), this._negociacoesView, ['adiciona', 'esvazia']);
 
     this._mensagemView = new MensagemView($('#mensagemView'));
-    this._mensagemView.update(this._mensagem);
+    this._mensagem = new Bind(new Mensagem(), this._mensagemView, ['texto']);
   }
 
   adiciona(event) {
