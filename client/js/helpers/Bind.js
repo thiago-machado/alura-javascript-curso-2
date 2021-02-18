@@ -8,7 +8,13 @@
 */
 class Bind {
 
-  constructor(model, view, props) {
+  /*
+  ProxyFactory precisa receber um array, por isso, as propriedades eram passadas
+  entre [] (colchetes).
+  Contudo, quando o último parâmetro de um construtor, função ou método é
+  variável, podemos usar o parâmetro REST operator (...).
+  */
+  constructor(model, view, ...props) {
 
     /*
     Criando um proxy com base no modelo (model) recebido como parâmetro.
