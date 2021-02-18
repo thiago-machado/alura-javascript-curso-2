@@ -59,6 +59,7 @@
     <script src="js/views/NegociacoesView.js"></script>
     <script src="js/models/Mensagem.js"></script>
     <script src="js/views/MensagemView.js"></script>
+    <script src="js/services/ProxyFactory.js"></script>
     <script>
       /*
       Criando uma instância de NegociacaoController.
@@ -71,76 +72,6 @@
       Usaremos isso, para escrever menos código na parte JavaScript.
       */
       let negociacaoController = new NegociacaoController();
-    </script>
-
-
-    <script>
-
-      /*
-      Existe um famoso padrão de projeto chamado Proxy, que de forma resumida,
-      é "um cara mentiroso".
-      Vimos que não é bom inserirmos armadilhas na classe, porque estaremos
-      perdendo a reutilização do modelo e teremos que repetir em todos os
-      modelos do sistema. No entanto, o Proxy é idêntico ao objeto que queremos
-      trabalhar, e teremos bastante dificuldade de diferenciá-los.
-      Nós acessamos o Proxy como se ele fosse o objeto real, este último
-      ficará escondido dentro do outro.
-      Nós substituímos o objeto real, que só poderá ser acessado por meio do
-      Proxy - que pode ou não ser executado em um código arbitrário se assim
-      definirmos.
-      */
-      // Proxy(object, {handlers});
-      let lista = new Proxy(new ListaNegociacoes(), {
-
-        /*
-        Interceptando as execuções dos métodos adiciona e esvazia
-        */
-        get(target, prop, receiver) {
-          /*
-          Verificando se a propriedade possui o texto 'adiciona', ou 'esvazia'.
-          Além disso, verifica se a propriedade é uma função. Pois pode acontecer de
-          termos atributos com esses nomes e isso não nos interessa interceptar.
-
-          Caso a condição seja atendida, retornamos uma function.
-          Com isso, estamos reescrevendo a lógica implementada em adiciona e esvazia.
-          No caso, desejamos exibir uma mensagem no log e desejamos executar a função
-          original através do Reflect.apply().
-          */
-          if(['adiciona', 'esvazia'].includes(prop) && typeof(target[prop]) == typeof(Function)) {
-              // Nesse momento, estamos substituindo a implementação dos métodos interceptados
-              // IMPORTANTE: não podemos usar arrow function pois precisamos de um contexto dinâmico para execução da lógica.
-              return function() {
-                
-                console.log(`a propriedade "${prop}" foi interceptada`); // exibindo log
-
-                /*
-                Continuar com a execução original do método interceptado.
-                1º param = o método que desejo executar
-                2º param = o contexto
-                3º param = os valores que desejo passar para a função por parâmetro
-
-                NOTA: o arguments é uma variável implícita que dá acesso a todos
-                os parâmetros da função quando esta é chamada.
-                Ou seja, se eu chamar arguments[0], terei acesso ao primeiro valor passado como
-                parâmetro e assim por diante.
-                */
-                Reflect.apply(target[prop], target, arguments);
-              }
-          }
-
-          // Caso não atenda ao if acima, continua com a execução padrão
-          return Reflect.get(target, prop, receiver);
-        }
-      });
-
-      /*
-      Toda vez que executamos um método/função, o JavaScript executa um GET e depois um
-      APPLY. Logo, quando executarmos as funções adiciona() e esvaliza(), vamos
-      interceptar a chamada desses métodos através do GET
-      */
-      lista.adiciona(new Negociacao(new Date(), 1, 100));
-      lista.esvazia();
-
     </script>
 </body>
 </html>
