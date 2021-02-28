@@ -52,25 +52,50 @@ class NegociacaoController {
       importaNegociacoes() {
 
         let service = new NegociacaoService();
+
         /*
-        Quando o nosso servidor, via AJAX, buscar a negociação e estiver tudo pronto,
-        ele chamará a função que adicionamos no parâmetro.
+        Se observarmos o método obterNegociacoesDaSemana(), veremos que este
+        não recebe mais o callback - apenas nos devolverá um valor.
+        Parecerá ser um método síncrono.
+        No entanto, ele não é. Porque ele não devolverá a lista de negociações,
+        mas, sim, uma promise - que não poderá encontrar o que busca.
+        A promessa é o resultado futuro de uma operação.
+        Quando pensamos no conceito de uma promessa, nos vem a ideia de que
+        "se você cumprir a promessa, então algo irá acontecer...".
+        Seguindo está relação com então, chamaremos o método then() na promise.
+
+        Se a promessa for cumprida, receberemos a lista de negociação e,
+        com esta, poderemos fazer o forEach(). O método obterNegociacoesDaSemana()
+        devolve uma promessa de que tentará obter os dados.
+        Caso a promessa seja cumprida, receberemos uma lista de negociações e
+        exibiremos a mensagem para o usuário.
+        Para o caso de ocorrer um erro, vamos encadear uma função catch(), na promise.
         */
-        service.obterNegociacoesDaSemana((erro, negociacoes) => {
+        service.obterNegociacoesDaSemana()
+        .then(negociacoes => {
+          negociacoes.forEach(negociacao => {
+            this._listaNegociacoes.adiciona(negociacao);
+          });
+          this._mensagem.texto = 'Negociações importadas com sucesso'
+        })
+        .catch(erro => this._mensagem.texto = erro);
 
-          /*
-          Em casos de erro, ele será descoberto sempre no primeiro parâmetro e
-          o resultado da operação virá no segundo.
-          Estamos aplicando um padrão que vem do mundo NodeJS,
-          e que recebe o nome de Error-First-Callback.
-          */
-          if(erro) {
-            this._mensagem.texto = erro;
-            return;
-          }
+        service.obterNegociacoesDaSemanaAnterior()
+        .then(negociacoes => {
+          negociacoes.forEach(negociacao => {
+            this._listaNegociacoes.adiciona(negociacao);
+          });
+          this._mensagem.texto = 'Negociações importadas com sucesso'
+        })
+        .catch(erro => this._mensagem.texto = erro);
 
-          negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
-          this._mensagem.texto = 'Negociações importadas com sucesso';
-        });
+        service.obterNegociacoesDaSemanaRetrasada()
+        .then(negociacoes => {
+          negociacoes.forEach(negociacao => {
+            this._listaNegociacoes.adiciona(negociacao);
+          });
+          this._mensagem.texto = 'Negociações importadas com sucesso'
+        })
+        .catch(erro => this._mensagem.texto = erro);
       }
     }
