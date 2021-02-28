@@ -54,48 +54,48 @@ class NegociacaoController {
         let service = new NegociacaoService();
 
         /*
-        Se observarmos o método obterNegociacoesDaSemana(), veremos que este
-        não recebe mais o callback - apenas nos devolverá um valor.
-        Parecerá ser um método síncrono.
-        No entanto, ele não é. Porque ele não devolverá a lista de negociações,
-        mas, sim, uma promise - que não poderá encontrar o que busca.
-        A promessa é o resultado futuro de uma operação.
-        Quando pensamos no conceito de uma promessa, nos vem a ideia de que
-        "se você cumprir a promessa, então algo irá acontecer...".
-        Seguindo está relação com então, chamaremos o método then() na promise.
+        A promise possui um recurso com o qual temos uma sequência de operações
+        assíncronas, que será executada em uma determinada ordem.
 
-        Se a promessa for cumprida, receberemos a lista de negociação e,
-        com esta, poderemos fazer o forEach(). O método obterNegociacoesDaSemana()
-        devolve uma promessa de que tentará obter os dados.
-        Caso a promessa seja cumprida, receberemos uma lista de negociações e
-        exibiremos a mensagem para o usuário.
-        Para o caso de ocorrer um erro, vamos encadear uma função catch(), na promise.
+        Uma maneira de executarmos todas as promises em ordem e obtermos todos
+        os resultado de uma vez só é usar a função Promise.all, que receberá
+        um array com as promises.
+
+        Pedimos para que o Promise.all() resolvesse todas as promises na ordem
+        indicada.
+        Iremos obter os dados da Promise com o then().
+        Caso ocorra um erro, trataremos com o catch().
+        E se der uma mensagem de erro específica de obterNegociacoesDaSemana(),
+        o catch() será chamado - sem precisar ser chamado diversas vezes.
+
+        A grande vantagem da função Promise.all() é que todas as promises do
+        array serão exibidos na sequência e o resultado estará em negociacoes,
+        e em caso de erro, ele será capturado uma única vez.
+        No entanto, a negociacao retornada não é equivalente à lista de
+        negociações, mas sim, cada posição do array será uma lista de negociações.
+        Ex.: [arrayDeNegociacoes, arrayDeNegociacoes, arrayDeNegociacoes].
+
+        Antes de chegarmos até o forEach() para iterar cada negociação,
+        executaremos uma transformação do array que possui outros três dentro
+        de si.
+        Com o reduce(), criaremos um array que contem apenas um elemento,
+        contendo todos as negociações.
+        Nós faremos flatten - achatar - o array.
+
+        No fim, o reduce devolverá uma única lista cheia de negociações e o
+        forEach() será executado sem problemas.
         */
-        service.obterNegociacoesDaSemana()
-        .then(negociacoes => {
-          negociacoes.forEach(negociacao => {
-            this._listaNegociacoes.adiciona(negociacao);
-          });
-          this._mensagem.texto = 'Negociações importadas com sucesso'
-        })
-        .catch(erro => this._mensagem.texto = erro);
-
-        service.obterNegociacoesDaSemanaAnterior()
-        .then(negociacoes => {
-          negociacoes.forEach(negociacao => {
-            this._listaNegociacoes.adiciona(negociacao);
-          });
-          this._mensagem.texto = 'Negociações importadas com sucesso'
-        })
-        .catch(erro => this._mensagem.texto = erro);
-
-        service.obterNegociacoesDaSemanaRetrasada()
-        .then(negociacoes => {
-          negociacoes.forEach(negociacao => {
-            this._listaNegociacoes.adiciona(negociacao);
-          });
-          this._mensagem.texto = 'Negociações importadas com sucesso'
+        Promise.all([
+          service.obterNegociacoesDaSemana(),
+          service.obterNegociacoesDaSemanaAnterior(),
+          service.obterNegociacoesDaSemanaRetrasada()]
+        ).then(negociacoes => {
+          negociacoes
+          .reduce((arrayAchatado, array) => arrayAchatado.concat(array), [])
+          .forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+          this._mensagem.texto = 'Negociações importadas com sucesso';
         })
         .catch(erro => this._mensagem.texto = erro);
       }
+
     }
