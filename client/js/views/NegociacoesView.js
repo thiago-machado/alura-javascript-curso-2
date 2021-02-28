@@ -58,7 +58,7 @@ class NegociacoesView extends View {
         Quando passamos para o segundo item da lista, este pega o valor anterior e o
         soma com o volume atual. No fim, a função retorna um valor único, que será o resultado de total.
          -->
-        <td>${ modelo.negociacoes.reduce((total, n) => total + n.volume, 0.0)}
+        <td>${ modelo.volumeTotal }
         </td>
     </tfoot>
     </table>
