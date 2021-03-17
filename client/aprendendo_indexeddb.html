@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Aprendendo IndexedDB</title>
+</head>
+
+<script src="js/models/Negociacao.js"></script>
+<script>
+
+  /*
+  O método indexedDB.open() retorna uma instância de IDBOpenDBRequest,
+  ou seja, uma requisição de abertura do banco.
+
+  Precisaremos lidar com um tríade de eventos disparados quando
+  tentarmos acessar um banco no IndexedDB. A seguir, adicionaremos a tríade:
+
+  openRequest.onupgradeneeded;
+  openRequest.onsucess;
+  openRequest.onerror.
+
+  O valor numérico passado como parâmetro é referente ao open() à versão do banco,
+  ou seja, no caso, utilizamos a versão 1.
+  Isto significa, que quando executarmos o código novamente o onupgradeneeded
+  só será invocado caso a versão passada no parênteses seja maior do que a
+  exibida no banco criado.
+  */
+
+  var connection = null;
+  var openRequest = window.indexedDB.open('aluraframe', 3);
+
+  // Cria um novo banco ou atualiza um já existente
+  openRequest.onupgradeneeded = e => {
+    console.log('Cria ou altera um banco já existente');
+
+    /*
+    O result será o IDBDatabase, ou seja, uma conexão que estamos guardando
+    dentro da variável connection que está no escopo maior. Mas antes de
+    começarmos a interagir com o banco, adicionaremos uma Object Store, que
+    é bastante semelhantes às tabelas dos bancos de dados relacionais.
+
+    Dentro da aluraframe teremos várias Object Stores, no entanto, não é
+    correto chamá-las de tabelas, porque elas não possuem esquemas.
+    Diferente de um banco de dados relacional, em que existem colunas
+    destinadas a texto, números e dados, numa Object Store, podemos gravar
+    objetos de diferentes formatos, contanto, que sejam válidos no JavaScript.
+
+    E como fazemos para criar a Object Store? Assim que criarmos o banco,
+    criaremos no onupgradeneeded uma Object Store chamada Negociacoes. Porém,
+    nós só teremos acesso à variável 'connection' no onsuccess - que só é
+    executado depois do onupgradeneeded. Não há problema, também temos acesso
+    à conexão dentro de 'onupgradeneeded', através de 'e.target.result', que
+    atribuiremos à variável minhaConnection.
+    */
+    var minhaConnection = e.target.result;
+    if(minhaConnection.objectStoreNames.contains('negociacoes')) {
+      minhaConnection.deleteObjectStore('negociacoes');
+    }
+    // Criando uma objectstore chamada negociacao que sera auto numerada sequencialmente
+    minhaConnection.createObjectStore('negociacoes', {autoIncrement: true});
+  };
+
+  // Sempre será chamado quando uma conexão é pega com sucesso
+  openRequest.onsuccess = e => {
+    console.log('Conexão obtida com sucesso');
+    // e.target.result é uma instância de IDBDatabase
+    connection = e.target.result;
+  };
+
+  // Em caso de erro ao pegar a conexão, cai nessa chamada
+  openRequest.onerror = e => {
+    console.log(e.target.error);
+  };
+
+  function adiciona() {
+
+    // Abrindo uma transaction para a objectstore negociacoes onde queremos ler e escrever
+    let transaction = connection.transaction(['negociacoes'],'readwrite');
+
+    // Pegando a objectstore
+    let store = transaction.objectStore('negociacoes');
+
+    let negociacao = new Negociacao(new Date(), 200, 1);
+
+    // Adicionando uma negociacao à objectstore
+    let request = store.add(negociacao);
+
+    request.onsuccess = e => {
+      console.log('Negociação incluída com sucesso');
+    };
+
+    request.onerror = e => {
+      console.log('Não foi possível incluir a negociação');
+    };
+
+    // Chamar esse método adiciona() pelo console do browser
+  }
+
+  function listaTodos() {
+
+    let transaction = connection.transaction(['negociacoes'],'readwrite');
+    let store = transaction.objectStore('negociacoes');
+    let negociacoes = [];
+
+    // O cursor é um objeto especial que nos permitirá iterar sobre todas as
+    // negociações armazenadas em nossa store.
+    let cursor = store.openCursor();
+
+    /*
+    O evento onsuccess do nosso cursor será chamado o número de vezes correspondente
+    à quantidade de negociações armazenadas em nossa object store. Na primeira chamada,
+    teremos acesso a um ponteiro para a primeira negociação, na segunda chamada
+    teremos um ponteiro para a segunda, e assim por diante...
+    */
+    cursor.onsuccess = e => {
+      let atual = e.target.result;
+      // Se atual possuir valor, entra no if...
+      if(atual) {
+        negociacoes.push(atual.value);
+        atual.continue(); // Acessando o próximo elemento
+      } else {
+
+        // Quando não há mais objects em nossa store.
+        // Isso significa que já terminados de popular negociacoes
+        console.log(negociacoes);
+      }
+    };
+
+    cursor.onerror = e => {
+      console.log('Error:' + e.target.error.name);
+    };
+  }
+
+</script>
+<body>
+</body>
+</html>
