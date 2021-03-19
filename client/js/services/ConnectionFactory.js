@@ -1,15 +1,15 @@
 /*
- Padrão de projeto JavaScript chamado Module Pattern.
- Um módulo é uma unidade código confinada e que ninguém tem acesso ao conteúdo
- dentro dele.
- Uma maneira de criarmos um escopo privado no JavaScript é colocando o código em uma função.
+Padrão de projeto JavaScript chamado Module Pattern.
+Um módulo é uma unidade código confinada e que ninguém tem acesso ao conteúdo
+dentro dele.
+Uma maneira de criarmos um escopo privado no JavaScript é colocando o código em uma função.
 
- Nós estamos criando uma função autoinvocada.
- Simultaneamente, ela será carregada e executada. Estamos enganando o compilador do
- JavaScript, porque o conteúdo do parênteses é uma função anônima...
- Em seguida, criaremos a variável ConnectionFactory no escopo global, mas o restante
- do código não estará.
- */
+Nós estamos criando uma função autoinvocada.
+Simultaneamente, ela será carregada e executada. Estamos enganando o compilador do
+JavaScript, porque o conteúdo do parênteses é uma função anônima...
+Em seguida, criaremos a variável ConnectionFactory no escopo global, mas o restante
+do código não estará.
+*/
 var ConnectionFactory = (function () {
 
   /*
@@ -94,9 +94,9 @@ var ConnectionFactory = (function () {
 
     static closeConnection(){
       if(connection){
-          close(); // Executando a função close original (lembrandi que é necessário o bind() passando connection).
-          //Reflect.apply(close, connection, []) // Também poderíamos fazer assim, sem precisar usar o bind()
-          connection = null;
+        close(); // Executando a função close original (lembrandi que é necessário o bind() passando connection).
+        //Reflect.apply(close, connection, []) // Também poderíamos fazer assim, sem precisar usar o bind()
+        connection = null;
       }
     }
   }
