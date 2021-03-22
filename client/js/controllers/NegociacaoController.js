@@ -18,42 +18,33 @@ class NegociacaoController {
       new MensagemView($('#mensagemView')),
       'texto');
 
-    console.log(ConnectionFactory);
-    ConnectionFactory
-    .getConnection()
-    .then(connection => {
-        new NegociacaoDao(connection)
-            .listaTodos()
-            .then(negociacoes => {
-                negociacoes.forEach(negociacao => {
-                    this._listaNegociacoes.adiciona(negociacao);
-                });
-            });
-      });
+    this._service = new NegociacaoService();
 
-      // Esse código comentado faz a mesma coisa que o código acima, mas de forma resumida
-      /*ConnectionFactory
-        .getConnection()
-        .then(connection => new NegociacaoDao(connection)) // mesmo que eu não esteja chamando uma promise aqui, eu posso retornar um objeto e pegá-lo no then abaixo
-        .then(dao => dao.listaTodos()) // esse dao do then anterior
-        .then(negociacoes => negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao)))*/
+    this._init();
+  }
+
+  _init() {
+    this._service
+      .lista()
+      .then(negociacoes =>
+        negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao)))
+      .catch(erro => this._mensagem.texto = erro);
+
+      setInterval(() => { this.importaNegociacoes() }, 5000);
   }
 
   adiciona(event) {
     event.preventDefault();
 
-    ConnectionFactory
-    .getConnection()
-    .then(conexao => {
-      let negociacao = this._criaNegociacao();
-      new NegociacaoDao(conexao)
-      .adiciona(negociacao)
-      .then(() => {
+    let negociacao = this._criaNegociacao();
+    this._service
+      .cadastra(negociacao)
+      .then(mensagem => {
         this._listaNegociacoes.adiciona(negociacao);
-      });
-    })
-    .catch(erro => this._mensagem.texto = erro);
-    //this._listaNegociacoes.adiciona(this._criaNegociacao());
+        this._mensagem.texto = mensagem;
+        this._limpaFormulario();
+      })
+      .catch(erro => this._mensagem.texto = erro);
   }
 
   ordena(coluna) {
@@ -90,53 +81,23 @@ class NegociacaoController {
 
   // Limpa a tabela caso o usuário clique no botão Apagar
   apaga() {
-    ConnectionFactory
-    .getConnection()
-    .then(connection => new NegociacaoDao(connection))
-    .then(dao => dao.apagaTodos())
-    .then(mensagem => {
-        this._mensagem.texto = mensagem;
-        this._listaNegociacoes.esvazia();
-    });
+
+    this._service
+      .apaga()
+      .then(mensagem => {
+          this._mensagem.texto = mensagem;
+          this._listaNegociacoes.esvazia();
+      })
+      .catch(erro => this._mensagem.texto = erro);
   }
 
   importaNegociacoes() {
-
-    let service = new NegociacaoService();
-
     /*
-    A promise possui um recurso com o qual temos uma sequência de operações
-    assíncronas, que será executada em uma determinada ordem.
-
-    Uma maneira de executarmos todas as promises em ordem e obtermos todos
-    os resultado de uma vez só é usar a função Promise.all, que receberá
-    um array com as promises.
-
-    Pedimos para que o Promise.all() resolvesse todas as promises na ordem
-    indicada.
-    Iremos obter os dados da Promise com o then().
-    Caso ocorra um erro, trataremos com o catch().
-    E se der uma mensagem de erro específica de obterNegociacoesDaSemana(),
-    o catch() será chamado - sem precisar ser chamado diversas vezes.
-
-    A grande vantagem da função Promise.all() é que todas as promises do
-    array serão exibidos na sequência e o resultado estará em negociacoes,
-    e em caso de erro, ele será capturado uma única vez.
-    No entanto, a negociacao retornada não é equivalente à lista de
-    negociações, mas sim, cada posição do array será uma lista de negociações.
-    Ex.: [arrayDeNegociacoes, arrayDeNegociacoes, arrayDeNegociacoes].
-
-    Antes de chegarmos até o forEach() para iterar cada negociação,
-    executaremos uma transformação do array que possui outros três dentro
-    de si.
-    Com o reduce(), criaremos um array que contem apenas um elemento,
-    contendo todos as negociações.
-    Nós faremos flatten - achatar - o array.
-
-    No fim, o reduce devolverá uma única lista cheia de negociações e o
-    forEach() será executado sem problemas.
+    Esse método antes era dessa maneira como está comentado.
+    Mas o professor resolver colocar todo esse código dentro de NegociacaoService,
+    com leves alterações. E essa alteração não foi mostrada em aula.
     */
-    Promise.all([
+    /*Promise.all([
       service.obterNegociacoesDaSemana(),
       service.obterNegociacoesDaSemanaAnterior(),
       service.obterNegociacoesDaSemanaRetrasada()]
@@ -146,7 +107,15 @@ class NegociacaoController {
       .forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
       this._mensagem.texto = 'Negociações importadas com sucesso';
     })
-    .catch(erro => this._mensagem.texto = erro);
+    .catch(erro => this._mensagem.texto = erro);*/
+    
+    this._service
+        .importa(this._listaNegociacoes.negociacoes)
+        .then(negociacoes => negociacoes.forEach(negociacao => {
+            this._listaNegociacoes.adiciona(negociacao);
+            this._mensagem.texto = 'Negociações importadas'
+        }))
+        .catch(erro => this._mensagem.texto = erro);
   }
 
 
