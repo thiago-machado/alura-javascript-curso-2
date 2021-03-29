@@ -50,22 +50,60 @@
     <br>
     <br>
     <div id="negociacoesView"></div>
-
-    <script src="js/models/Negociacao.js"></script>
-    <script src="js/controllers/NegociacaoController.js"></script>
-    <script src="js/helpers/DateHelper.js"></script>
-    <script src="js/views/View.js"></script>
-    <script src="js/models/ListaNegociacoes.js"></script>
-    <script src="js/views/NegociacoesView.js"></script>
-    <script src="js/models/Mensagem.js"></script>
-    <script src="js/views/MensagemView.js"></script>
-    <script src="js/services/ProxyFactory.js"></script>
-    <script src="js/helpers/Bind.js"></script>
-    <script src="js/services/NegociacaoService.js"></script>
-    <script src="js/services/HttpService.js"></script>
-    <script src="js/services/ConnectionFactory.js"></script>
-    <script src="js/dao/NegociacaoDao.js"></script>
+    <script src="js/app/models/Negociacao.js"></script>
+    <script src="js/app/controllers/NegociacaoController.js"></script>
+    <script src="js/app/views/View.js"></script>
+    <script src="js/app/helpers/DateHelper.js"></script>
+    <script src="js/app/models/ListaNegociacoes.js"></script>
+    <script src="js/app/views/NegociacoesView.js"></script>
+    <script src="js/app/models/Mensagem.js"></script>
+    <script src="js/app/views/MensagemView.js"></script>
+    <script src="js/app/services/ProxyFactory.js"></script>
+    <script src="js/app/helpers/Bind.js"></script>
+    <script src="js/app/services/NegociacaoService.js"></script>
+    <script src="js/app/services/HttpService.js"></script>
+    <script src="js/app/services/ConnectionFactory.js"></script>
+    <script src="js/app/dao/NegociacaoDao.js"></script>
     <script>
+      /*
+      SOBRE O BABEL:
+      BABEL é um transcompilador
+
+      INSTALAÇÃO:
+      Para instalá-lo, acessar o diretório client e executar via cmd: npm init
+      Teclar ENTER para todas as questões.
+      Para instalar o módulo do Babel, executamos: npm install babel-cli@6.10.1 --save-dev
+      Para instalar o suporte ao ES2015, executamos: npm install babel-preset-es2015@6.9.0 --save-devC
+      Todo o código que desenvolvemos em ES6 deve ficar no diretório: js/app-es6
+
+      CONFIGURANDO BUILD:
+      Para configurar o build do babel, basta acessar o arquivo package.json, em "scripts",
+      e adicionar a linha: "build": "babel js/app-es6 -d js/app "
+      Para realizar a transcompilação, basta executar esse comando via cmd: npm run build
+
+      SOURCE MAPS:
+      Para ajudar no debug, podemos deixar o build dessa maneira:
+      "build": "babel js/app-es6 -d js/app --source-maps"
+      Com isso, qualquer erro que ocorra, o browser indicará o problema nos arquivos
+      que estão em app-es6 e não nos arquivos transcompilados.
+
+      WATCH:
+      Para evitar que precisemos executar npm run build toda vez que fizermos
+      uma alteração em algum arquivo, podemos configurar um watch.
+      Com isso, qualquer alteração que aconteça nos scripts, serão transcompiladas
+      sem que precisemos intervir.
+      Para isso, no arquivo package.json,em "scripts", podemos incluir a linha:
+       "watch": "babel js/app-es6 -d js/app --source-maps --watch"
+
+       Feito isso, basta executar o comando via cmd: npm run watch
+
+       O terminal ficará "congelado", como se estivesse aguardando alguma coisa.
+       E realmente está. Se fizermos alguma alteração em algum script e salvarmos,
+       o transcompilador será executado automaticamente e o cmd informará qual
+       arquivo foi editado e transcompilado.
+
+      */
+
       /*
       Criando uma instância de NegociacaoController.
       Essa instãncia está sendo utilizada em onsubmit da tag <form>.

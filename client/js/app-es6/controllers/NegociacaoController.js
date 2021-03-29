@@ -108,7 +108,7 @@ class NegociacaoController {
       this._mensagem.texto = 'Negociações importadas com sucesso';
     })
     .catch(erro => this._mensagem.texto = erro);*/
-    
+
     this._service
         .importa(this._listaNegociacoes.negociacoes)
         .then(negociacoes => negociacoes.forEach(negociacao => {

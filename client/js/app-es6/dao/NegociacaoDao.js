@@ -1,5 +1,4 @@
 /*
-
 Criamos nossa própria solução de persistência aplicando padrões de projeto e
 combinando um pouco de tudo que vimos nos módulos anteriores, Procuramos
 esconder a complexidade de se lidar com o IndexedDB através das classes
@@ -12,7 +11,6 @@ assim como fizemos.
 
 Como a ideia deste treinamento é que você se torne cangaceiro em JavaScript,
 não usamos nenhum biblioteca externa e fizemos tudo na mão!
-
 */
 class NegociacaoDao {
 
